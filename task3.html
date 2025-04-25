@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tic Tac Toe</title>
+</head>
+<body style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: linear-gradient(to bottom, #f0f4f8, #d9e4ec); font-family: Arial, sans-serif;">
+
+  <h1 style="margin-bottom: 20px;">Tic Tac Toe</h1>
+
+  <div id="board" style="display: grid; grid-template-columns: repeat(3, 100px); grid-gap: 10px;">
+  </div>
+
+  <p id="status" style="margin: 20px; font-size: 18px;">Player X's turn</p>
+  <button onclick="resetGame()" style="padding: 10px 20px; border: none; background: #007bff; color: white; border-radius: 8px; cursor: pointer;">Reset</button>
+
+  <script>
+    const board = document.getElementById('board');
+    const status = document.getElementById('status');
+    let currentPlayer = 'X';
+    let gameActive = true;
+    let gameState = ["", "", "", "", "", "", "", "", ""];
+
+    const winningConditions = [
+      [0,1,2], [3,4,5], [6,7,8],
+      [0,3,6], [1,4,7], [2,5,8],
+      [0,4,8], [2,4,6]
+    ];
+
+    function createBoard() {
+      board.innerHTML = '';
+      gameState.forEach((cell, index) => {
+        const cellDiv = document.createElement('div');
+        cellDiv.style.cssText = `
+          width: 100px;
+          height: 100px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: white;
+          border-radius: 12px;
+          font-size: 40px;
+          font-weight: bold;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        `;
+        cellDiv.dataset.index = index;
+        cellDiv.addEventListener('click', handleClick);
+        cellDiv.innerHTML = getMarkerHTML(cell);
+        board.appendChild(cellDiv);
+      });
+    }
+
+    function getMarkerHTML(player) {
+      if (player === 'O') {
+        return `<div style="width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle at center, #4facfe, transparent);"></div>`;
+      } else if (player === 'X') {
+        return `<svg width="50" height="50" viewBox="0 0 100 100" stroke="#ff6b6b" stroke-width="10">
+                  <line x1="10" y1="10" x2="90" y2="90"/>
+                  <line x1="90" y1="10" x2="10" y2="90"/>
+                </svg>`;
+      }
+      return '';
+    }
+
+    function handleClick(e) {
+      const index = e.currentTarget.dataset.index;
+      if (gameState[index] !== "" || !gameActive) return;
+
+      gameState[index] = currentPlayer;
+      createBoard();
+      checkWinner();
+    }
+
+    function checkWinner() {
+      for (const condition of winningConditions) {
+        const [a, b, c] = condition;
+        if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+          status.innerText = `Player ${currentPlayer} wins!`;
+          gameActive = false;
+          return;
+        }
+      }
+
+      if (!gameState.includes("")) {
+        status.innerText = "It's a draw!";
+        gameActive = false;
+        return;
+      }
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      status.innerText = `Player ${currentPlayer}'s turn`;
+    }
+
+    function resetGame() {
+      gameState = ["", "", "", "", "", "", "", "", ""];
+      currentPlayer = 'X';
+      gameActive = true;
+      status.innerText = `Player X's turn`;
+      createBoard();
+    }
+    createBoard();
+  </script>
+</body>
+</html>
